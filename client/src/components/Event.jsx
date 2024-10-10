@@ -1,62 +1,78 @@
-import React, { useState, useEffect } from 'react'
-import '../css/Event.css'
+import React, { useState, useEffect } from 'react';
+import '../css/Event.css';
+import EventsAPI from '../../services/EventsAPI.jsx'; // Ensure this path is correct
 
 const Event = (props) => {
+    const [event, setEvent] = useState({}); // Initialize as an empty object
+    const [formattedDate, setFormattedDate] = useState('');
+    const [remaining, setRemaining] = useState('');
 
-    const [event, setEvent] = useState([])
-    const [time, setTime] = useState([])
-    const [remaining, setRemaining] = useState([])
+    // Fetch event data when the component mounts
+    useEffect(() => {
+        const fetchEventData = async () => {
+            try {
+                const eventData = await EventsAPI.getEventsById(props.id);
+                console.log("Fetched Event Data:", eventData); // Log the fetched event data
+                setEvent(eventData); // Set the event data
+            } catch (error) {
+                console.error('Error fetching event data:', error);
+            }
+        };
+        fetchEventData();
+    }, [props.id]); // Fetch when the ID changes
 
     useEffect(() => {
-        (async () => {
-            try {
-                const eventData = await EventsAPI.getEventsById(props.id)
-                setEvent(eventData)
-            }
-            catch (error) {
-                throw error
-            }
-        }) ()
-    }, [])
+        if (event.start_time) {
+            // Format the date and time from start_time
+            const date = new Date(event.start_time);
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                hour: 'numeric', 
+                minute: 'numeric', 
+                hour12: true 
+            };
+            const formattedDateString = date.toLocaleString('en-US', options);
+            setFormattedDate(formattedDateString);
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const result = await dates.formatTime(event.time)
-                setTime(result)
-            }
-            catch (error) {
-                throw error
-            }
-        }) ()
-    }, [event])
+            // Calculate remaining time
+            const now = new Date();
+            const timeDiff = date - now;
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const timeRemaining = await dates.formatRemainingTime(event.remaining)
-                setRemaining(timeRemaining)
-                dates.formatNegativeTimeRemaining(remaining, event.id)
+            if (timeDiff < 0) {
+                // If event has passed
+                setRemaining("Event has passed");
+            } else {
+                // Calculate remaining months and days
+                const months = Math.floor(timeDiff / (1000 * 60 * 60 * 24 * 30)); // Approximate months
+                const days = Math.floor((timeDiff % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24)); // Remaining days
+
+                const remainingTimeString = 
+                    `${months > 0 ? `${months} month${months > 1 ? 's' : ''}` : ''}` +
+                    (months > 0 && days > 0 ? ' & ' : '') + 
+                    `${days > 0 ? `${days} day${days > 1 ? 's' : ''}` : ''}`;
+
+                setRemaining(remainingTimeString || 'Less than 1 day');
             }
-            catch (error) {
-                throw error
-            }
-        }) ()
-    }, [event])
+        }
+    }, [event]);
 
     return (
         <article className='event-information'>
-            <img src={event.image} />
-
+            <img src={event.image_url} alt={event.name} /> {/* Updated to use image_url */}
             <div className='event-information-overlay'>
                 <div className='text'>
-                    <h3>{event.title}</h3>
-                    <p><i className="fa-regular fa-calendar fa-bounce"></i> {event.date} <br /> {time}</p>
+                    <h3>{event.name}</h3> {/* Updated to use name */}
+                    <p>
+                        <i className="fa-regular fa-calendar fa-bounce"></i>
+                        {formattedDate}
+                    </p>
                     <p id={`remaining-${event.id}`}>{remaining}</p>
                 </div>
             </div>
         </article>
-    )
-}
+    );
+};
 
-export default Event
+export default Event;

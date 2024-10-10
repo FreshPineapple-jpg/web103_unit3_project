@@ -1,11 +1,18 @@
+.event-cards-container {
+    display: flex;
+    flex-wrap: wrap; /* Allow cards to wrap to the next line */
+    justify-content: center; /* Center the cards in the row */
+    padding: 10px; /* Optional padding */
+    max-width: 100%; /* Ensure it doesn’t exceed the parent width */
+    box-sizing: border-box; /* Include padding in width calculations */
+}
+
 .event-information {
-    position: relative;
-    width: 350px;
-    height: 350px;
-    padding: 0px;
-    margin: 20px;
-    border: 2px solid white;
-    border-radius: 0px;
+    position: relative; /* Ensure absolute positioning of child elements is relative to this */
+    width: 350px; /* Fixed width for each card */
+    height: 350px; /* Fixed height for each card */
+    margin: 20px; /* Space around each card */
+    overflow: hidden; /* Prevent any overflow from the cards */
 }
 
 .event-information img {
@@ -17,7 +24,7 @@
 .event-information-overlay {
     position: absolute;
     bottom: 0;
-    left: 100%;
+    left: 0; /* Changed from 100% to 0 to align correctly */
     right: 0;
     background-color: var(--primary);
     overflow: hidden;
@@ -28,7 +35,7 @@
 
 .event-information:hover .event-information-overlay {
     width: 100%;
-    left: 0;
+    left: 0; /* Ensures the overlay expands correctly */
 }
 
 .text {
@@ -55,3 +62,22 @@
     padding: 10px;
     text-align: center;
 }
+
+.event-cards-container {
+    display: flex;
+    flex-wrap: wrap; /* Allow cards to wrap to the next line */
+    justify-content: center; /* Center the cards in the row */
+    padding: 10px; /* Optional padding */
+    max-width: 100%; /* Ensure it doesn’t exceed the parent width */
+    box-sizing: border-box; /* Include padding in width calculations */
+}
+
+.event-information {
+    width: 350px; /* Keep the fixed width for each card */
+    height: 350px; /* Keep the fixed height for each card */
+    margin: 20px; /* Space around each card */
+    flex: 0 0 auto; /* Prevent flex items from growing */
+}
+
+
+
